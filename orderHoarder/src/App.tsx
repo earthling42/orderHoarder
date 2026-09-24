@@ -3,13 +3,31 @@ import heroImg from './assets/hero.png'
 import reactLogo from './assets/react.svg'
 import viteLogo from './assets/vite.svg'
 import './App.css'
+import AuthControl from './gui/AuthControl'
+import { OrderScreen } from './gui/OrderScreen'
 
 function App() {
   const [count, setCount] = useState(0)
+  const [isLoggedIn, setIsLoggedIn] = useState(false)
+
 
   return (
     <>
       <section id="center">
+        {!isLoggedIn && <AuthControl />}
+        {isLoggedIn && <OrderScreen />}
+        <button
+          type="button"
+          onClick={() => setIsLoggedIn(!isLoggedIn)}  
+        >
+            fake login
+        </button>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
         <div className="hero">
           <img src={heroImg} className="base" width="170" height="179" alt="" />
           <img src={reactLogo} className="framework" alt="React logo" />
