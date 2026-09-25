@@ -1,17 +1,13 @@
  import { useState } from 'react';
  import { Users_Authenticate } from '../api/Users_Authenticate';
- import { Users_List } from '../api/Users_List.tsx';
+
  
- function AuthControl() {
-    
-    // const [formData, setFormData] = useState({
-    //     username: '',
-    //     password: ''
-    // });
+ function AuthControl({setActiveComponent}) {
+
     const [username, setUserName] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
-    const [authResponse, setAuthResponse] = useState(null);
+    const [authResponse, setAuthResponse] = useState<any[]>([]);
 
     const handleNameChange = (e) => {
         setUserName(e.target.value); 
@@ -22,13 +18,14 @@
     };
 
     const handleAuthSubmit = async (e) => {
-        console.log('handleAuthSubmit called with username:', username, 'and password:', password);
+       
         e.preventDefault(); 
         setLoading(true);
         try
         {
-            //setAuthResponse( await Users_Authenticate(username , password))
-            setAuthResponse( await Users_List())
+            setAuthResponse( await Users_Authenticate(username , password));
+            console.log('Authentication response:', authResponse);
+            setActiveComponent("OrderScreen");
         } 
         catch (error) 
         {
@@ -42,10 +39,6 @@
 
   return (
     <form onSubmit={handleAuthSubmit}>
-         <span>
-           authResponse: {authResponse}
-        </span>       
-        <br />
        <span>
             Username:
             &nbsp;
@@ -71,7 +64,7 @@
         </span>
         <br />
         <button type="submit" style={{ marginTop: '15px' }} disabled={loading}>
-          {loading ? 'Submitting...' : 'Submit'}
+          {loading ? 'Logging in...' : 'Login'}
         </button>
     </form>
   );
