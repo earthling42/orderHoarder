@@ -2,7 +2,7 @@
  import { Users_Authenticate } from '../api/Users_Authenticate';
 
  
- function AuthControl({setActiveComponent}) {
+ function AuthControl({parentSetActiveComponentCallback}) {
 
     const [username, setUserName] = useState('');
     const [password, setPassword] = useState('');
@@ -25,7 +25,7 @@
         {
             setAuthResponse( await Users_Authenticate(username , password));
             console.log('Authentication response:', authResponse);
-            setActiveComponent("OrderScreen");
+            parentSetActiveComponentCallback("OrderScreen");
         } 
         catch (error) 
         {

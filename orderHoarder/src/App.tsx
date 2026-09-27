@@ -5,7 +5,7 @@ import OrderScreen from './gui/OrderScreen'
 import OrderPlacedControl from './gui/OrderPlacedControl';
 
 function App() {
-  //const [isLoggedIn, setIsLoggedIn] = useState(false)
+
   const AvailableComponents = {
     AuthControl: "AuthControl",
     OrderScreen: "OrderScreen",
@@ -15,19 +15,30 @@ function App() {
   type AvailableComponent =
     (typeof AvailableComponents)[keyof typeof AvailableComponents]
 
-  const [activeComponent, setActiveComponent] = useState<AvailableComponent>(AvailableComponents.AuthControl)
-  const [orderID, setOrderID] = useState(0);
+  const [activeComponent, setActiveComponent] = useState<AvailableComponent>(AvailableComponents.AuthControl);
+  const [orderResponse, setOrderResponse] = useState<any[]>([]);
+  const [productList, setProductList] = useState<any[]>([]);
+
+  // function getOrderResponse() :any[] {
+  //   return orderResponse;
+  // } 
+
+  function getProductList() :any[] {
+    return productList;
+  } 
 
   const renderComponent = () => {
     switch (activeComponent) {
       case AvailableComponents.AuthControl:
-        return <AuthControl setActiveComponent={setActiveComponent}  />
+        return <AuthControl parentSetActiveComponentCallback={setActiveComponent}  />
       case AvailableComponents.OrderScreen:
-        return <OrderScreen setActiveComponent={setActiveComponent} setOrderID={setOrderID} />
+        return <OrderScreen parentSetActiveComponentCallback={setActiveComponent} parentSetOrderResponse={setOrderResponse} parentSetProductList={setProductList}/>
       case AvailableComponents.OrderPlacedControl:
-        return <OrderPlacedControl setActiveComponent={setActiveComponent} orderID={orderID} />
+        //return <OrderPlacedControl parentSetActiveComponentCallback={setActiveComponent} getOrderResponse={getOrderResponse} parentGetProductList={getProductList}/>
+        console.log("passing in orderResponse:", orderResponse);
+        return <OrderPlacedControl parentSetActiveComponentCallback={setActiveComponent} orderResponse={orderResponse} parentGetProductList={getProductList}/>
       default:
-        return <AuthControl setActiveComponent={setActiveComponent} />
+        return <AuthControl parentSetActiveComponentCallback={setActiveComponent} />
     }
   }
 

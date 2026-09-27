@@ -182,3 +182,12 @@
     border-right-color: var(--border);
   }
 }
+
+.table-container {
+  display: flex;          /* Aligns tables horizontally */
+  gap: 20px;              /* Adds spacing between the tables */
+}
+
+table {
+  flex: 1;                /* Forces tables to share equal width equally */
+}

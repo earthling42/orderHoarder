@@ -1,49 +1,27 @@
-import { useEffect, useState } from "react";
-import { Orders_Get } from "../api/Orders_Get";
-
+import { useState } from "react";
 
 type OrderPlacedControlProps = {
-    setActiveComponent: (componentName: string) => void;
-    orderID: number;
+    parentSetActiveComponentCallback: (componentName: string) => void;
+    orderResponse: any[];
+    parentGetProductList: () => any[];
 };
 
-function OrderPlacedControl({ setActiveComponent, orderID }: OrderPlacedControlProps) {
+function OrderPlacedControl({ parentSetActiveComponentCallback, orderResponse , parentGetProductList}: OrderPlacedControlProps) {
 
-    const [productsList, setProductsList] = useState<any[]>([]);
-    const [orderDetails, setOrderDetails] = useState<any[]>([]);    
-    const [orderResponse, setOrderResponse] = useState<any[]>([]);
-    const [customerName, setCustomerName] = useState('');
-    
     const [loading, setLoading] = useState(false);
-
-    async function Async_Order_Get(orderID :number) {
-        setLoading(true);
-        console.log('Fetching order details for orderID:', orderID);
-        const response = await Orders_Get(orderID);
-        console.log('Orders_Get response:', response);
-        setOrderResponse(response);
-        setLoading(false);
-    }
-
-    useEffect( () => {
-        console.log('OrderPlacedControl mounted');
-        Async_Order_Get(orderID);
-    }, [orderID]);
-
-
-  
+    const response = orderResponse;
+    console.log("OrderPlacedControl: passed in order response: ",{response})
+    const productList = parentGetProductList();
+      
     async function handleAnotherOrder(): Promise<void> {
         setLoading(true);
-        setActiveComponent("OrderScreen");  
+        parentSetActiveComponentCallback("OrderScreen");  
         setLoading(false);
     }
 
     return (
         <div>
-            <h1>Order Placed Screen</h1>
-
-
-           
+            <h1>Order Placed</h1>
             <br />
             <span>
                 Customer Name:
@@ -51,13 +29,59 @@ function OrderPlacedControl({ setActiveComponent, orderID }: OrderPlacedControlP
                 &nbsp;
                 {}
             </span>
+            <table style={{ textAlign: 'left', border: '2px solid black', borderCollapse: 'separate', width: '500px', padding: '20px', margin: '20px'}}>
+                 <thead>
+                    <tr>
+                        <th>Customer:</th>
+                        <th>{response.customerName}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Order Number: </td>
+                        <td>{response.orderID}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <table style={{ textAlign: 'left', border: '2px solid black', borderCollapse: 'separate', width: '500px', padding: '20px', margin: '20px'}}>
+                <thead>
+                    <tr>
+                        <th>Product Name</th>
+                        <th>Quantity</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        {response.orderDetails.map((detail) => (
+                            <tr>
+                                <td>{productList.find(product => product.productID === detail.productID)?.productName}</td>
+                                <td>
+                                    {detail.quantity}
+                                </td>
+                            </tr>
+                        )
+                    )}
+                                       
+                </tbody>
+            </table> 
+            <table style={{ textAlign: 'left', border: '2px solid black', borderCollapse: 'separate', width: '500px', padding: '20px', margin: '20px'}}>
+                <tbody>
+                    <tr>
+                        <td>Subotal(Ex VAT)</td>
+                        <td>{response.salesValueExcludingVAT}</td>
+                    </tr>
+                    <tr>
+                        <td>Total</td>
+                        <td>{response.salesValueIncludingVAT}</td>
+                    </tr>     
+                </tbody>
+            </table>                      
             <br />
             <button type="button"
                 onClick={() => handleAnotherOrder()}  
                 style={{ marginTop: '15px' }} 
                 disabled={loading}
             >
-            {loading ? 'Opening order screen...' : 'Submit Order'}
+            {loading ? 'Opening order screen...' : 'New Order'}
             </button>
         </div>
     );
