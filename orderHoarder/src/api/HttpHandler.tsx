@@ -3,10 +3,11 @@ const API_SUBSCRIPTION_KEY = "f252dddeba574e619df3ee4381780d7e";
 
 export async function HttpPost(urlStub :string, postData :any[]) {
     console.log('HttpPost called with urlStub:', urlStub);
-    console.log('HttpPost called with postData:', postData);
     console.log('HttpPost called with stringigfied postData:', JSON.stringify(postData));
+
+    const completeUrl = `${API_BASE_URL}${urlStub}`;
     const postResponse = await fetch(
-        `${API_BASE_URL}${urlStub}`,
+        completeUrl,
         {
             method: 'POST', 
             headers: {
@@ -27,13 +28,14 @@ export async function HttpGet(urlStub :string, getData :any[]) {
     url.search = new URLSearchParams(getData[0]).toString();
 
     console.log('HttpGet called with url:', url.toString());
+    console.log('HttpGet called with search:', url.search);
 
     const getResponse = await fetch(
        url,
         {
             method: 'GET', 
             headers: {
-                'Content-Type': 'application/json', 
+                'Accept': '*/*', 
                 'Ocp-Apim-Subscription-Key': API_SUBSCRIPTION_KEY
             },
         }

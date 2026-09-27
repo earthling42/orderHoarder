@@ -3,10 +3,9 @@ import { HttpGet } from './HttpHandler';
 export async function Products_List() {
     
     let response: any[] = [];
-    console.log('Attempting to get Products_List');
 
     try {
-        //response = await HttpGet("Products_List");
+        //response = await HttpGet("Products", []);
         response = [{"productID":1,"productName":"Table","categoryName":"Furniture","unitPrice":2000.0000}
             ,{"productID":2,"productName":"Chair","categoryName":"Furniture","unitPrice":500.0000}
             ,{"productID":3,"productName":"Plasma screen","categoryName":"Audio Visual","unitPrice":15000.0000}

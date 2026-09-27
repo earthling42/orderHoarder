@@ -13,10 +13,16 @@ function OrderScreen({ parentSetActiveComponentCallback, parentSetOrderResponse,
     const [orderResponse, setOrderResponse] = useState<any[]>([]);
     const [customerName, setCustomerName] = useState('');
     const [loading, setLoading] = useState(false);
+    const [validationPassed, setValidationPassed] = useState(false);
 
     useEffect( () => {
-        console.log('OrderScreen mounted');
+        setValidationPassed( customerName !== "" && orderDetails.length !== 0  );
+    }
+    , [customerName , orderDetails])
 
+    const formatter = new Intl.NumberFormat('en-US');
+
+    useEffect( () => {
         async function fetchProductsList() {
             const productListResponse = await Products_List();
             setProductsList(productListResponse);
@@ -26,6 +32,7 @@ function OrderScreen({ parentSetActiveComponentCallback, parentSetOrderResponse,
         async function initializeOrderDetail() {
             setOrderDetails([]);
         }       
+
         fetchProductsList();
         initializeOrderDetail();
     }
@@ -44,35 +51,27 @@ function OrderScreen({ parentSetActiveComponentCallback, parentSetOrderResponse,
     }
 
     const addProductToOrder = (e) => {
-        console.log('addProductToOrder called with productID:', e);
         if (orderDetails.some(detail => detail.productID === e)) {
-            console.log('Product already in orderDetails, not adding:', e);
             return;
         }   
         setOrderDetails([...orderDetails, { "productID": e, "quantity": 1}]);
     }
 
     function handleDeleteOrderDetail(productID: any): void {
-        console.log('handleDeleteOrderDetail called with productID:',productID);
         if (!orderDetails.some(detail => detail.productID === productID)) {
-            console.log('Product not found in orderDetails, cannot delete:', productID);
+            console.error('Product not found in orderDetails, cannot delete:', productID);
             return;
         }   
         orderDetails.find(detail => detail.productID === productID)
         const targetIndex = orderDetails.findIndex(detail => detail.productID === productID);
-
         setOrderDetails(orderDetails.filter((_, index) => index !== targetIndex));
-        console.log('Updated orderDetails after deletion:', orderDetails);   
     }
   
     async function handleSubmitOrder(): Promise<void> {
         setLoading(true);
         const directResponse = await Orders_Submit(1, new Date().toISOString(), customerName, orderDetails);
-        console.log("DIRECT_RESPONSE: ", directResponse)
         setOrderResponse(directResponse);
-        //console.log('Order submission returned to the screen. Response:', orderResponse);
         parentSetOrderResponse(directResponse);
-        console.log("parentSetOrderResponse: ", directResponse);
         parentSetActiveComponentCallback("OrderPlacedControl");
         setLoading(false);        
     }
@@ -97,55 +96,63 @@ function OrderScreen({ parentSetActiveComponentCallback, parentSetOrderResponse,
                             onChange={handleCustomerNameChange} 
                         />
                     </span>
-
-                    <table style={{ textAlign: 'left', border: '2px solid black', borderCollapse: 'separate', width: '500px', padding: '20px', margin: '20px'}}>
-                        <thead>
-                            <tr>
-                                <th>Product Name</th>
-                                <th>Quantity</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {orderDetails.length === 0 ? (
-                                <span>
-                                    <tr>
-                                        <td colSpan={2}>Click on a product in the product list to add it to your order.</td>
-                                    </tr>
-                                    <tr>
-                                        <td>-- empty order --</td>
-                                    </tr>
-                                </span>
-                                ) : (
-                                    orderDetails.map((detail) => (
-                                        <tr key={detail.productID}>
-                                            <td>{productsList.find(product => product.productID === detail.productID)?.productName}</td>
-                                            <td>
-                                                <input
-                                                    type='text'
-                                                    value={detail.quantity}
-                                                    onChange={(e) => handleQuantityChange(e, detail.productID)}
-                                                />
-                                            </td>
-                                            <td>
-                                            <button type="button" onClick={() => handleDeleteOrderDetail(detail.productID)}>
-                                                Delete
-                                            </button>
-                                            </td>
+                    <span>
+                        <table style={{ textAlign: 'left', border: '2px solid black', borderCollapse: 'separate', width: '500px', padding: '20px', margin: '20px'}}>
+                            <thead>
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th>Quantity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {orderDetails.length === 0 ? (
+                                    <span>
+                                        <tr>
+                                            <td colSpan={2}>Click on a product in the product list to add it to your order.</td>
                                         </tr>
-                                    ))
-                                )
-                            }
-                        </tbody>
+                                        <tr>
+                                            <td>-- empty order --</td>
+                                        </tr>
+                                    </span>
+                                    ) : (
+                                        orderDetails.map((detail) => (
+                                            <tr key={detail.productID}>
+                                                <td>{productsList.find(product => product.productID === detail.productID)?.productName}</td>
+                                                <td>
+                                                    <input
+                                                        type='text'
+                                                        value={detail.quantity}
+                                                        onChange={(e) => handleQuantityChange(e, detail.productID)}
+                                                    />
+                                                </td>
+                                                <td>
+                                                <button type="button" onClick={() => handleDeleteOrderDetail(detail.productID)}>
+                                                    Delete
+                                                </button>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    )
+                                }
+                                <tr>
+                                    <td style={{ textAlign:  'center', verticalAlign: 'middle'}}  colSpan={2} >
+                                        <button type="button"
+                                                onClick={() => handleSubmitOrder()}  
+                                                style={{ marginTop: '15px' }} 
+                                                disabled={!validationPassed}
+                                            >
+                                            {loading ? 'Submitting Order...' : 'Submit Order'}
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
 
-                    </table>
-                    <button type="button"
-                        onClick={() => handleSubmitOrder()}  
-                        style={{ marginTop: '15px' }} 
-                        disabled={loading}
-                    >
-                    {loading ? 'Submitting Order...' : 'Submit Order'}
-                    </button>
+                        </table>
+                    </span>
+
+
                 </table>
+
 
                 <table>
                         <h2>Product List</h2>
@@ -154,7 +161,7 @@ function OrderScreen({ parentSetActiveComponentCallback, parentSetOrderResponse,
                                 <tr>
                                     <th>Product Name</th>
                                     <th>Category</th>
-                                    <th>Unit Price</th>
+                                    <th style={{ textAlign: 'right'}}>Unit Price</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -162,7 +169,7 @@ function OrderScreen({ parentSetActiveComponentCallback, parentSetOrderResponse,
                                     <tr key={product.productID}>
                                         <td><div onClick={() => addProductToOrder(product.productID)}>{product.productName}</div></td>
                                         <td>{product.categoryName}</td>
-                                        <td>{product.unitPrice.toFixed(2)}</td>
+                                        <td style={{ textAlign: 'right'}}>{formatter.format(product.unitPrice)}</td>
                                     </tr>
                                     ))
                                 }

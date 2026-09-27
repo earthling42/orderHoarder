@@ -34,8 +34,6 @@ function App() {
       case AvailableComponents.OrderScreen:
         return <OrderScreen parentSetActiveComponentCallback={setActiveComponent} parentSetOrderResponse={setOrderResponse} parentSetProductList={setProductList}/>
       case AvailableComponents.OrderPlacedControl:
-        //return <OrderPlacedControl parentSetActiveComponentCallback={setActiveComponent} getOrderResponse={getOrderResponse} parentGetProductList={getProductList}/>
-        console.log("passing in orderResponse:", orderResponse);
         return <OrderPlacedControl parentSetActiveComponentCallback={setActiveComponent} orderResponse={orderResponse} parentGetProductList={getProductList}/>
       default:
         return <AuthControl parentSetActiveComponentCallback={setActiveComponent} />

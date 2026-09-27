@@ -1,4 +1,4 @@
- import { useState } from 'react';
+ import { useRef, useState , useEffect} from 'react';
  import { Users_Authenticate } from '../api/Users_Authenticate';
 
  
@@ -7,6 +7,7 @@
     const [username, setUserName] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [validationPassed, setValidationPassed] = useState(false);
     const [authResponse, setAuthResponse] = useState<any[]>([]);
 
     const handleNameChange = (e) => {
@@ -14,17 +15,24 @@
     };
 
     const handlePasswordChange = (e) => {
-            setPassword(e.target.value)
+        setPassword(e.target.value)
     };
 
+    const usernameRef = useRef(null);
+    const passwordRef = useRef(null);
+
+    useEffect( () => {
+        setValidationPassed( usernameRef.current.value !== "" && passwordRef.current.value !== "" );
+    }
+    , [username , password])
+
     const handleAuthSubmit = async (e) => {
-       
         e.preventDefault(); 
         setLoading(true);
         try
         {
-            setAuthResponse( await Users_Authenticate(username , password));
-            console.log('Authentication response:', authResponse);
+            const authenticatResponse = await Users_Authenticate(username , password);
+            setAuthResponse(authenticatResponse);
             parentSetActiveComponentCallback("OrderScreen");
         } 
         catch (error) 
@@ -38,35 +46,40 @@
     }
 
   return (
-    <form onSubmit={handleAuthSubmit}>
-       <span>
-            Username:
-            &nbsp;
-            &nbsp;
-            <input 
-                type="text" 
-                name="username" 
-                value={username} 
-                onChange={handleNameChange} 
-            />
-        </span>
-        <br />
+    <div>
+        <h1 className='heading-h1'>Order Hoarder</h1>
+        <form onSubmit={handleAuthSubmit}>
         <span>
-            Password:
-            &nbsp;
-            &nbsp;
-            <input 
-                type="password" 
-                name="password" 
-                value={password} 
-                onChange={handlePasswordChange} 
-            />
-        </span>
-        <br />
-        <button type="submit" style={{ marginTop: '15px' }} disabled={loading}>
-          {loading ? 'Logging in...' : 'Login'}
-        </button>
-    </form>
+                Username:
+                &nbsp;
+                &nbsp;
+                <input 
+                    type="text" 
+                    name="username" 
+                    value={username} 
+                    onChange={handleNameChange} 
+                    ref={usernameRef}
+                />
+            </span>
+            <br />
+            <span>
+                Password:
+                &nbsp;
+                &nbsp;
+                <input 
+                    type="password" 
+                    name="password" 
+                    value={password} 
+                    onChange={handlePasswordChange} 
+                    ref={passwordRef}
+                />
+            </span>
+            <br />
+            <button type="submit" style={{ marginTop: '15px' }} disabled={loading || !validationPassed}>
+            {loading ? 'Logging in...' : 'Login'}
+            </button>
+        </form>
+    </div>
   );
 }
 

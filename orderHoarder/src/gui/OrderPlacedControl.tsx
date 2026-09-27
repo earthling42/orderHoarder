@@ -10,8 +10,8 @@ function OrderPlacedControl({ parentSetActiveComponentCallback, orderResponse , 
 
     const [loading, setLoading] = useState(false);
     const response = orderResponse;
-    console.log("OrderPlacedControl: passed in order response: ",{response})
     const productList = parentGetProductList();
+    const formatter = new Intl.NumberFormat('en-US');
       
     async function handleAnotherOrder(): Promise<void> {
         setLoading(true);
@@ -47,14 +47,14 @@ function OrderPlacedControl({ parentSetActiveComponentCallback, orderResponse , 
                 <thead>
                     <tr>
                         <th>Product Name</th>
-                        <th>Quantity</th>
+                        <th style={{ textAlign: 'right'}}>Quantity</th>
                     </tr>
                 </thead>
                 <tbody>
                         {response.orderDetails.map((detail) => (
                             <tr>
                                 <td>{productList.find(product => product.productID === detail.productID)?.productName}</td>
-                                <td>
+                                <td style={{ textAlign: 'right'}}>
                                     {detail.quantity}
                                 </td>
                             </tr>
@@ -67,11 +67,11 @@ function OrderPlacedControl({ parentSetActiveComponentCallback, orderResponse , 
                 <tbody>
                     <tr>
                         <td>Subotal(Ex VAT)</td>
-                        <td>{response.salesValueExcludingVAT}</td>
+                        <td style={{ textAlign: 'right'}}>{formatter.format(response.salesValueExcludingVAT)}</td>
                     </tr>
                     <tr>
                         <td>Total</td>
-                        <td>{response.salesValueIncludingVAT}</td>
+                         <td style={{ textAlign: 'right'}}>{formatter.format(response.salesValueIncludingVAT)}</td>
                     </tr>     
                 </tbody>
             </table>                      

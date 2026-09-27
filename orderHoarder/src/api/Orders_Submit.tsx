@@ -10,14 +10,8 @@ export async function Orders_Submit(userID :number, orderDate :string, customerN
     };
 
     let response :any[] = [];
-    console.log('Submitting order for user:', userID);
-    console.log('completedOrder:', completeOrder);
-    
     try {
-        console.log('Orders_Submit called with userID:', userID, 'orderDate:', orderDate, 'customerName:', customerName, 'orderDetails:', orderDetails); 
-        console.log('completedOrder:', completeOrder);
         //response = await HttpPost("Orders", completeOrder);
-
         response = {
             "orderID": 2, "userID": "1", "orderDate": "2026-09-08T12:00:00Z", "customerName": "Bacme Corp",
             "salesValueExcludingVAT": 2900.0000, "discount": 0.10, "salesValueIncludingVAT": 2610.000000,
@@ -27,7 +21,7 @@ export async function Orders_Submit(userID :number, orderDate :string, customerN
             ]
         }
 
-        console.log('Response:', response);
+
         if (response && "error" in response)
         {
             throw new Error(`HTTP error in Orders_Submit! status: ${response.error}`);
@@ -35,7 +29,6 @@ export async function Orders_Submit(userID :number, orderDate :string, customerN
     } catch (error) {
         console.error('Error making POST request:', error);
     }  
-    console.log('Returning response:', response);
     return (response);
 };
 
